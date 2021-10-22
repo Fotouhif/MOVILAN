@@ -1,0 +1,11 @@
+*.pptx
+*.pyc
+MOVILAN_data/
+cross_modal/data/descriptions.json
+cross_modal/prehash.npy
+cross_modal/unet_weights.pth
+mapper/nn_weights/
+mapper/data/
+language_understanding/alfred_model_1000_modification/
+**/__pycache__
+planner/low_level_planner/__pycache__/object_type.cpython-36.pyc
