@@ -10,6 +10,8 @@ OPENS = eqc.OPENS
 INVEN_OBJS = eqc.INVEN_OBJS
 TOGGLES = eqc.TOGGLES
 CONFUSIONS = eqc.CONFUSIONS
+RECEPS = eqc.RECEPS
+SLICES = eqc.SLICES
 
 def bigNsmallobs(objs):
     small = []
@@ -24,7 +26,10 @@ def bigNsmallobs(objs):
 def openables(objs):
     to_open = []
     to_put = []
-
+    #convert to list if only 1 object is passed
+    if isinstance(objs, list)==False:
+        objs = [objs]
+    
     for o in objs:
         if o in OPENS:
             to_open.append(o)
@@ -32,9 +37,45 @@ def openables(objs):
             to_put.append(o)
     return to_put, to_open
 
+def opens_toggles(objs):
+    opto = []
+    #convert to list if only 1 object is passed
+    if isinstance(objs, list)==False:
+        objs = [objs]
+    
+    for o in objs:
+        if o in OPENS and o in TOGGLES:
+            opto.append(o)
+    return opto
+
+def receps_toggles(objs):
+    receps = []
+    toggles = []
+    #convert to list if only 1 object is passed
+    if isinstance(objs, list)==False:
+        objs = [objs]
+    
+    for o in objs:
+        if o in RECEPS:
+            receps.append(o)
+        if o in TOGGLES:
+            toggles.append(o)
+    return receps,toggles
+
+def sliceables(objs):
+    to_slice = []
+
+    for o in objs:
+        if o in SLICES:
+            to_slice.append(o)
+
+    return to_slice
+
 def toggleables(objs):
     to_on = []
-
+    #convert to list if only 1 object is passed
+    if isinstance(objs, list)==False:
+        objs = [objs]
     for o in objs:
         if o in TOGGLES:
             to_on.append(o)

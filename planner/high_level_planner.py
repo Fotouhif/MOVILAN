@@ -12,6 +12,9 @@ from language_understanding import parse_funcs as pf
 from planner.low_level_planner import navigation_signatures as ns
 from planner.low_level_planner import manipulation_signatures as ms
 
+import planner.low_level_planner.resolve as resolve
+field_of_view = resolve.field_of_view
+
 from planner import params
 
 import json
@@ -46,7 +49,7 @@ CARRY = eqc.CARRY
 PICK = eqc.PICK # ! Get can also be used as a pointer for navigation- eg - get to the desk near bed
 WALK = eqc.WALK
 WALK_ST = eqc.WALK_ST
-
+INVEN_OBJS = eqc.INVEN_OBJS
 
 replace_missing_slots = pf.replace_missing_slots #is a helper language parsing function
 
@@ -98,28 +101,33 @@ def other_side_attempt(GRIDS,FACE_GRIDS,target_obj,ref_obj,localize_params, env)
     
     targ_obj = ns.resolve_refinement(ref_obj,target_obj)
     if targ_obj==[] or targ_obj==None: #for example floor is not considered an object
+        #if the language misguides to navigate to small objects that are to be manipulated
+        #then instead go to the last successfully navigated target from agent memory
+        if target_obj in INVEN_OBJS:
+            target_obj = env.memory['navigated'][-1]
         targ_obj = target_obj
         print("Improper refinement, changed target to ",targ_obj)
 
     try:
-        grid, face_grids = ns.occupancy_grid(targ_obj, localize_params)
+        grid, face_grids = ns.occupancy_grid(env, targ_obj, ref_obj, localize_params)
 
 
         env = ns.graph_search(grid,face_grids, env, targ_obj, localize_params, other_side = 1)
         env = ns.unit_refinement(env, targ_obj)
     except:
+        traceback.print_exc()
         print("Probably ",targ_obj," is not visible at all from this position")
         print("Trying to find out from previous images in trajectory ")
         try:
             grid, face_grids = GRIDS[targ_obj], FACE_GRIDS[targ_obj]
         except:
-            print("Seems like table was never navigated to earlier, so may not exist in the room")
+            print("Seems like ",targ_obj," was never navigated to earlier, so may not exist in the room")
             print("In that case, resolving confusion to see if another object is meant")
             targ_obj = ns.resolve_confusions(targ_obj, env)
-            grid, face_grids = ns.occupancy_grid(targ_obj, localize_params)
+            grid, face_grids = ns.occupancy_grid(env, targ_obj, ref_obj, localize_params)
 
         env = ns.graph_search(grid,face_grids, env, targ_obj, localize_params, other_side = 1)
-        env, event = ns.unit_refinement(env, targ_obj)
+        env = ns.unit_refinement(env, targ_obj)
 
     
     print(" ")
@@ -130,7 +138,8 @@ def other_side_attempt(GRIDS,FACE_GRIDS,target_obj,ref_obj,localize_params, env)
 
 
 def get_file(rn = 302, task_index = 1, trial_num = 0):
-    folders = sorted(glob.glob('/alfred/data/json_2.1.0/train/*'+repr(rn))) #for home computer
+    #folders = sorted(glob.glob('/alfred/data/json_2.1.0/train/*'+repr(rn))) #for home computer
+    folders = sorted(glob.glob(params.trajectory_data_location+repr(rn)))
     #folders = sorted(glob.glob('/home/microway/Desktop/hsaha/ai2thor/alfred/data/json_2.1.0/train/*'+repr(rn))) #for cluster
     #print("glob folders ",folders)
     #use sorted(glob.glob()) for systematic order in accesing the files
@@ -145,7 +154,7 @@ def get_file(rn = 302, task_index = 1, trial_num = 0):
 
 
 
-def run(env, sentences, intents, slot_dicts, ground_truth_map = -1):
+def run(env, sentences, intents, slot_dicts, ground_truth_map = -1, interactive = False):
     
     rewards = []
     grids = []
@@ -167,6 +176,8 @@ def run(env, sentences, intents, slot_dicts, ground_truth_map = -1):
 
     try:
         for i in range(len(intents)):
+            if interactive:
+                pause_input = input("paused for user input type anything and press enter ")
             intent = intents[i]
             slots = slot_dicts[i]
             sent = sentences[i]
@@ -176,9 +187,17 @@ def run(env, sentences, intents, slot_dicts, ground_truth_map = -1):
             goalsat2 = env.get_postconditions_met() #for home computer
             #goalsat2 = env.get_goal_conditions_met() #for cluster
 
-            if intent=="navigation" and slots['action_n_navi'] in CARRY:
+            n_navi_actions = pf.fnl(slots['action_n_navi'])
+            any_carry = any([nna in CARRY for nna in n_navi_actions])
+            any_pick = any([nna in PICK for nna in n_navi_actions])
+            print("got n_navi_actions ",n_navi_actions)
+            print("got any_carry ",any_carry)
+            print("got any_pick ",any_pick)
+            #sys.exit(0)
+
+            if intent=="navigation" and any_carry:
                 intent = "n_navigation"
-            if intent=="navigation" and slots['action_n_navi'] in PICK and slots['target_obj']!='':
+            if intent=="navigation" and any_pick and slots['target_obj']!='':
                 print("There seems to be a mismatch in intent and slots !")
                 print("Analyzing whether this is navigation or manipulation -> ",sent)
                 targ_objs = naming.name_objects(slots['target_obj'],sent)
@@ -203,10 +222,14 @@ def run(env, sentences, intents, slot_dicts, ground_truth_map = -1):
                     print("Recognized target objects -> ",targ_objs, "/ ",slots['target_obj'])
                     ref_obj = naming.name_objects(slots['refinement_obj'],sent)
                     print("Recognized refinement objects -> ",ref_obj," / ",slots['refinement_obj'])
+                    ref_rel = naming.name_directions(slots['refinement_rel'])
+                    print("Recognized refinement relative -> ",ref_rel," / ",slots['refinement_rel'])
+                    tar_rel = naming.name_directions(slots['target_rel'])
+                    print("Recognized target relative -> ",tar_rel," / ",slots['target_rel'])
                     action_navi = naming.name_movements(slots['action_navi'])
                     print("Recognized navigation actions -> ",action_navi, "/ ",slots['action_navi'])
                     action_desc = naming.name_movements(slots['action_desc'])
-                    print("Recognized navigation action decs -> ",action_desc, "/ ",slots['action_desc'])
+                    print("Recognized navigation action descs -> ",action_desc, "/ ",slots['action_desc'])
                     action_int_desc = naming.intensity2digits(slots['action_intensity']) #is a flat list of words
                     print("Recognized action intensities -> ",action_int_desc, "/ ",slots['action_intensity'])
                     print(" ")
@@ -248,6 +271,14 @@ def run(env, sentences, intents, slot_dicts, ground_truth_map = -1):
                                     print("Executing move ahead ")
                                     event = env.step(dict({"action": "MoveAhead"}))
                                 inten_count+=1
+                            elif (action_navi[act_n] in WALK) and action_desc[desc_count]=='through':
+                                print("Blind instruction walk through a space")
+                                for _ in range(20):
+                                    event,col = env.check_collision("MoveAhead")
+                                    if col:
+                                        print("reached end of room")
+                                        break
+                                desc_count+=1
                             elif (action_navi[act_n] in WALK) and action_desc[desc_count] in WALK_ST: #for instructions like go forward without specifying any number of steps
                                 print("Blind instruction arbitrary walk")
                                 for _ in range(4): #lets keep the arbitrary steps to 4
@@ -293,7 +324,7 @@ def run(env, sentences, intents, slot_dicts, ground_truth_map = -1):
                                 localize_params = {"room":env}
                             
                             try:
-                                grid, face_grids = ns.occupancy_grid(targ_obj, localize_params)
+                                grid, face_grids = ns.occupancy_grid(env, targ_obj, ref_obj, localize_params)
                             
                             except:
                                 traceback.print_exc()
@@ -302,7 +333,7 @@ def run(env, sentences, intents, slot_dicts, ground_truth_map = -1):
                                     v, diff = ns.target_visible(env,targ_obj) 
                                     
                                     if v!=-1:
-                                        grid, face_grids = ns.occupancy_grid(targ_obj, localize_params, hallucinate = diff)
+                                        grid, face_grids = ns.occupancy_grid(env, targ_obj, ref_obj, localize_params, hallucinate = diff)
                                         #when halucinating, the proposed location of the object could be way outside border of map
                                         #so need to recursively expand the location borders until it gets inside the map
                                         #so need inf number of recursion stacks
@@ -312,7 +343,7 @@ def run(env, sentences, intents, slot_dicts, ground_truth_map = -1):
                                         #after one round of hallucination agent might have goten close enough to get the actual map
                                         if targ_obj not in ns.TEXTURES:
                                             #texture objects like doors and mats cannot just be localized in any way
-                                            grid, face_grids = ns.occupancy_grid(targ_obj, localize_params)
+                                            grid, face_grids = ns.occupancy_grid(env, targ_obj, ref_obj, localize_params)
 
 
                                     else:
@@ -324,11 +355,18 @@ def run(env, sentences, intents, slot_dicts, ground_truth_map = -1):
                                             targ_obj = ns.resolve_confusions(targ_obj, env, ref_obj = ref_obj)
                                             
 
-                                            grid, face_grids = ns.occupancy_grid(targ_obj, localize_params)
+                                            grid, face_grids = ns.occupancy_grid(env, targ_obj, ref_obj, localize_params)
                                         else:
                                             grid, face_grids = g, f
                                 else:
                                     print("Target object ",targ_obj," is too small to map")
+                                    print("swapping target and refinement objects ")
+                                    #sometimes for cases like go to the pot on top of table, the language understanding detects pot as target and table as ref
+                                    #but it needs to be opposite, navigate to the bigger object
+                                    targ_obj = copy.copy(ref_obj)
+                                    ref_obj = copy.copy(targ_obj)
+                                    grid, face_grids = ns.occupancy_grid(env, targ_obj, ref_obj, localize_params)
+
 
                             
                             env = ns.graph_search(grid,face_grids, env, targ_obj, localize_params, notarget = False)
@@ -342,6 +380,19 @@ def run(env, sentences, intents, slot_dicts, ground_truth_map = -1):
                             FACE_GRIDS[targ_obj] = face_grids
 
                     print(" ")
+                    print(" ")
+                    print("Executing post navigation corrections if any ")
+                    
+                    #for example telling to face opposite something
+                    field = field_of_view(env)
+                    obj_vis = any([ref_obj.split(',')[0]+'|' in a for a in list(field.keys())])
+                    if ref_rel.split(',')[0]=='opposite' and obj_vis and tar_rel.split(',')[0]=='face':
+                        print("caught object visible ",ref_obj.split(',')[0])
+                        print("caught target relative ",tar_rel.split(',')[0])
+                        print("caught instruction opposite so turning around")
+                        event = env.step(dict({"action": "RotateLeft"}))
+                        event = env.step(dict({"action": "RotateLeft"}))
+
             
             if intent=="n_navigation": 
                 print("********** In manipulation **********\n")
@@ -368,23 +419,35 @@ def run(env, sentences, intents, slot_dicts, ground_truth_map = -1):
                     ms.drawer_manipulation_remove(manip_action,target_obj,ref_rel, ref_obj, env, event)
                     print(" ")
 
-                elif manip_action=="carry": 
+                #elif manip_action=="carry": 
+                if "carry" in manip_action: 
                     targ_obj = ns.resolve_refinement(ref_obj,target_obj) 
                     try:
-                        grid, face_grids = ns.occupancy_grid(targ_obj, localize_params)
+                        grid, face_grids = ns.occupancy_grid(env, targ_obj, ref_obj, localize_params)
                     except:
                         print("WARNING ! target object ",targ_obj, " not found in the map, looking for similar objects ")
                         targ_obj = ns.resolve_confusions(targ_obj, env)
-                        grid, face_grids = ns.occupancy_grid(targ_obj, localize_params)
+                        grid, face_grids = ns.occupancy_grid(env, targ_obj, ref_obj, localize_params)
 
                     env = ns.graph_search(grid,face_grids, env, targ_obj, localize_params)
                     print("\n\n\n\n")
-                    env, event = ns.unit_refinement(env, targ_obj)
+                    env = ns.unit_refinement(env, targ_obj)
                     print("\n\n\n\n") #just some gap for the debuggers eye
                     
 
                     ms.carry(ref_obj,ref_rel,env)
                     print("\n\n\n\n")
+
+                if "clean" in manip_action:
+                    env = ms.clean(manip_action,target_obj,ref_rel, ref_obj, env) 
+                    print("\n\n\n\n")
+
+                    env= ms.set_default_tilt(env)
+
+
+
+
+
 
 
                 elif manip_action=='turnon': 
@@ -398,7 +461,7 @@ def run(env, sentences, intents, slot_dicts, ground_truth_map = -1):
                             target_obj = "DeskLamp"
                         if params.room_type=="Kitchen":
                             target_obj = "FloorLamp"
-                        grid, face_grids = ns.occupancy_grid(target_obj, localize_params)
+                        grid, face_grids = ns.occupancy_grid(env, target_obj, ref_obj, localize_params)
                         env = ns.graph_search(grid,face_grids, env, targ_obj, localize_params)
                         print("\n\n\n\n")
                         
@@ -406,15 +469,15 @@ def run(env, sentences, intents, slot_dicts, ground_truth_map = -1):
                         print("\n\n\n\n")
 
 
-
-                elif manip_action=='pick' or manip_action=="pick,carry": 
+                #sometimes sentences like pick up the slice of apple gets together like pick,slice
+                elif manip_action=='pick' or manip_action=="pick,carry" or manip_action=="pick,slice": 
                     env = ms.refined_pick(manip_action,target_obj,ref_rel,ref_obj,env)
                     print("\n\n\n\n")
                     if not ms.check_pick(env): 
 
                         env = other_side_attempt(GRIDS,FACE_GRIDS,target_obj,ref_obj, localize_params, env) 
                         #now try to pick up again
-                        env = ms.refined_pick(manip_action,target_obj,ref_rel,ref_obj,env,event)
+                        env = ms.refined_pick(manip_action,target_obj,ref_rel,ref_obj,env)
                         print("\n\n\n\n")
 
                 elif manip_action=='close,pick':
@@ -437,27 +500,39 @@ def run(env, sentences, intents, slot_dicts, ground_truth_map = -1):
                         print("\n\n\n\n")
 
                     elif len(ref_obj.split(','))<=2:
-                        env,event = ms.refined_place(manip_action,target_obj,ref_rel,ref_obj,env) 
+                        env = ms.refined_place(manip_action,target_obj,ref_rel,ref_obj,env) 
                         print("\n\n\n\n")
 
-                        if not ms.check_place(env,event):
+                        if not ms.check_place(env):
                             env = ms.set_default_tilt(env)
 
                             env = other_side_attempt(GRIDS,FACE_GRIDS,target_obj,ref_obj,localize_params,env)
                             #now try to pick up again
-                            env,event = ms.refined_place(manip_action,target_obj,ref_rel,ref_obj,env)
+                            env = ms.refined_place(manip_action,target_obj,ref_rel,ref_obj,env)
                             print("\n\n\n\n")
 
 
                     elif len(ref_obj.split(','))>=3: 
-                        env, event = ms.refined_place2(manip_action,target_obj,ref_rel,ref_obj,env,event)
+                        env = ms.refined_place2(manip_action,target_obj,ref_rel,ref_obj,env)
                         print("\n\n\n\n")
-                        if not ms.check_place(env,event):
+                        if not ms.check_place(env):
 
                             env = other_side_attempt(GRIDS,FACE_GRIDS,target_obj,ref_obj,localize_params, env)
                             #now try to pick up again
-                            env = ms.refined_place2(manip_action,target_obj,ref_rel,ref_obj,env,event)
+                            env = ms.refined_place2(manip_action,target_obj,ref_rel,ref_obj,env)
                             print("\n\n\n\n")
+
+                    env= ms.set_default_tilt(env)
+
+                elif manip_action=='slice': 
+                    env = ms.refined_slice(manip_action,target_obj,ref_rel, ref_obj, env) 
+                    print("\n\n\n\n")
+
+                    env= ms.set_default_tilt(env)
+
+                elif manip_action=="cook" or manip_action=="cook,pick": 
+                    env = ms.cook(manip_action,target_obj,ref_rel, ref_obj, env) 
+                    print("\n\n\n\n")
 
                     env= ms.set_default_tilt(env)
 
@@ -516,12 +591,14 @@ def run(env, sentences, intents, slot_dicts, ground_truth_map = -1):
             shutil.rmtree('/home/hom/Desktop/ai2thor/sample_traj/frames') #clear junk data first
             os.system('mkdir sample_traj/frames')
         '''
-
+        env.init_memory()
         return task_tracker
 
     except:
         print("failed to execute complete action for some error")
         traceback.print_exc()
+        exp_length = get_demo_traj_length(env.rn, env.task_index, env.trial_num) #they sould be set earlier in main file
+        task_tracker["exp_length"] = exp_length
         task_tracker["goal_satisfied"] = 0
         task_tracker["subgoal_idx"] = -1
         task_tracker["post_conditions"] = env.get_postconditions_met()
