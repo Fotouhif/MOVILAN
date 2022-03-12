@@ -1,0 +1,33 @@
+
+Using diff LR
+Epoch: 1/25. Loop: Train:   0%|                                                  | 0/482 [00:01<?, ?it/s]
+Traceback (most recent call last):
+  File "train.py", line 411, in <module>
+    main_worker(args.gpu, ngpus_per_node, args)
+  File "train.py", line 107, in main_worker
+    train(model, args, epochs=args.epochs, lr=args.lr, device=args.gpu, root=args.root,
+  File "train.py", line 187, in train
+    bin_edges, pred = model(img)
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/fotouhif/Documents/AdaBins_depth/models/unet_adaptive_bins.py", line 93, in forward
+    unet_out = self.decoder(self.encoder(x), **kwargs)
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/fotouhif/Documents/AdaBins_depth/models/unet_adaptive_bins.py", line 71, in forward
+    features.append(vi(features[-1]))
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/torch/nn/modules/container.py", line 117, in forward
+    input = module(input)
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/fotouhif/.cache/torch/hub/rwightman_gen-efficientnet-pytorch_master/geffnet/efficientnet_builder.py", line 174, in forward
+    x = self.bn1(x)
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/torch/nn/modules/batchnorm.py", line 131, in forward
+    return F.batch_norm(
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/torch/nn/functional.py", line 2056, in batch_norm
+    return torch.batch_norm(
+RuntimeError: CUDA out of memory. Tried to allocate 34.00 MiB (GPU 0; 1.96 GiB total capacity; 1.07 GiB already allocated; 23.56 MiB free; 1.09 GiB reserved in total by PyTorch)

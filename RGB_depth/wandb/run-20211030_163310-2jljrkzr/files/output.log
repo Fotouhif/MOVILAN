@@ -1,0 +1,63 @@
+
+Using diff LR
+
+Epoch: 1/25. Loop: Train:   0%|                                                  | 0/482 [00:01<?, ?it/s]
+Process SpawnProcess-1:
+Traceback (most recent call last):
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/torch/multiprocessing/spawn.py", line 19, in _wrap
+    fn(i, *args)
+  File "/home/fotouhif/Documents/AdaBins_depth/train.py", line 107, in main_worker
+    train(model, args, epochs=args.epochs, lr=args.lr, device=args.gpu, root=args.root,
+  File "/home/fotouhif/Documents/AdaBins_depth/train.py", line 187, in train
+    bin_edges, pred = model(img)
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/torch/nn/parallel/distributed.py", line 619, in forward
+    output = self.module(*inputs[0], **kwargs[0])
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/fotouhif/Documents/AdaBins_depth/models/unet_adaptive_bins.py", line 93, in forward
+    unet_out = self.decoder(self.encoder(x), **kwargs)
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/fotouhif/Documents/AdaBins_depth/models/unet_adaptive_bins.py", line 71, in forward
+    features.append(vi(features[-1]))
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/torch/nn/modules/container.py", line 117, in forward
+    input = module(input)
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/fotouhif/.cache/torch/hub/rwightman_gen-efficientnet-pytorch_master/geffnet/efficientnet_builder.py", line 179, in forward
+    x = self.conv_pw(x)
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/torch/nn/modules/conv.py", line 423, in forward
+    return self._conv_forward(input, self.weight)
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/torch/nn/modules/conv.py", line 419, in _conv_forward
+    return F.conv2d(input, weight, self.bias, self.stride,
+RuntimeError: CUDA out of memory. Tried to allocate 34.00 MiB (GPU 0; 1.96 GiB total capacity; 1.08 GiB already allocated; 26.31 MiB free; 1.08 GiB reserved in total by PyTorch)
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/torch/multiprocessing/spawn.py", line 26, in _wrap
+    sys.exit(1)
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/site-packages/wandb/sdk/wandb_run.py", line 136, in exit
+    self._orig_exit(orig_code)
+SystemExit: 1
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/multiprocessing/process.py", line 318, in _bootstrap
+    util._exit_function()
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/multiprocessing/util.py", line 357, in _exit_function
+    p.join()
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/multiprocessing/process.py", line 149, in join
+    res = self._popen.wait(timeout)
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/multiprocessing/popen_fork.py", line 47, in wait
+    return self.poll(os.WNOHANG if timeout == 0.0 else 0)
+  File "/home/fotouhif/miniconda3/envs/vln/lib/python3.8/multiprocessing/popen_fork.py", line 27, in poll
+    pid, sts = os.waitpid(self.pid, flag)
+KeyboardInterrupt

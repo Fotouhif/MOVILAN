@@ -13,7 +13,6 @@ mapper/nn_weights/
 mapper/data/
 language_understanding/alfred_model_1000_modification/
 steps_to_run
-RGB_depth
 RGB_seg
 mapper/dgl
 mapper/ReadmeFateme

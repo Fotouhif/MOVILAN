@@ -1,0 +1,171 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.12.1
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    python_version: 3.8.3
+    start_time: 1635629590
+    t:
+      1:
+      - 1
+      4: 3.8.3
+      5: 0.12.1
+      8:
+      - 5
+batch_size:
+  desc: null
+  value: 16
+bs:
+  desc: null
+  value: 16
+chamfer:
+  desc: null
+  value: true
+data_path:
+  desc: null
+  value: /home/fotouhif/Documents/MOVILAN/RGB_depth/data/Training_testing/RGB/
+data_path_eval:
+  desc: null
+  value: /home/fotouhif/Documents/MOVILAN/RGB_depth/data/Training_testing/RGB/
+dataset:
+  desc: null
+  value: nyu
+degree:
+  desc: null
+  value: 2.5
+dist_backend:
+  desc: null
+  value: nccl
+dist_url:
+  desc: null
+  value: tcp://127.0.0.1:15005
+distributed:
+  desc: null
+  value: true
+div_factor:
+  desc: null
+  value: 25
+do_kb_crop:
+  desc: null
+  value: false
+do_random_rotate:
+  desc: null
+  value: true
+eigen_crop:
+  desc: null
+  value: true
+epoch:
+  desc: null
+  value: 0
+epochs:
+  desc: null
+  value: 25
+filenames_file:
+  desc: null
+  value: /home/fotouhif/Documents/MOVILAN/RGB_depth/data/alfred_rgb_depth_train_shuffle.txt
+filenames_file_eval:
+  desc: null
+  value: /home/fotouhif/Documents/MOVILAN/RGB_depth/data/alfred_rgb_depth_test.txt
+final_div_factor:
+  desc: null
+  value: 100
+garg_crop:
+  desc: null
+  value: false
+gpu:
+  desc: null
+  value: 0
+gt_path:
+  desc: null
+  value: /home/fotouhif/Documents/MOVILAN/RGB_depth/data/Training_testing/depth/
+gt_path_eval:
+  desc: null
+  value: /home/fotouhif/Documents/MOVILAN/RGB_depth/data/Training_testing/depth/
+input_height:
+  desc: null
+  value: 300
+input_width:
+  desc: null
+  value: 300
+last_epoch:
+  desc: null
+  value: -1
+lr:
+  desc: null
+  value: 0.000357
+max_depth:
+  desc: null
+  value: 10000.0
+max_depth_eval:
+  desc: null
+  value: 10000.0
+min_depth:
+  desc: null
+  value: 1.0
+min_depth_eval:
+  desc: null
+  value: 1.0
+mode:
+  desc: null
+  value: train
+multigpu:
+  desc: null
+  value: true
+n_bins:
+  desc: null
+  value: 80
+name:
+  desc: null
+  value: UnetAdaptiveBins
+ngpus_per_node:
+  desc: null
+  value: 1
+norm:
+  desc: null
+  value: linear
+notes:
+  desc: null
+  value: ''
+num_threads:
+  desc: null
+  value: 11
+num_workers:
+  desc: null
+  value: 11
+rank:
+  desc: null
+  value: 0
+resume:
+  desc: null
+  value: ''
+root:
+  desc: null
+  value: .
+same_lr:
+  desc: null
+  value: false
+tags:
+  desc: null
+  value: sweep
+use_right:
+  desc: null
+  value: false
+validate_every:
+  desc: null
+  value: 100
+w_chamfer:
+  desc: null
+  value: 0.1
+wd:
+  desc: null
+  value: 0.1
+workers:
+  desc: null
+  value: 11
+world_size:
+  desc: null
+  value: 1

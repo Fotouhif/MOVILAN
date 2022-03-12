@@ -1,0 +1,29 @@
+2021-10-30 16:26:56,155 INFO    MainThread:19419 [wandb_setup.py:_flush():69] setting env: {}
+2021-10-30 16:26:56,155 INFO    MainThread:19419 [wandb_setup.py:_flush():69] setting login settings: {}
+2021-10-30 16:26:56,155 INFO    MainThread:19419 [wandb_setup.py:_flush():69] setting login settings: {'mode': 'offline'}
+2021-10-30 16:26:56,155 INFO    MainThread:19419 [wandb_init.py:_log_setup():342] Logging user logs to ./wandb/offline-run-20211030_162656-1rjlulmn/logs/debug.log
+2021-10-30 16:26:56,155 INFO    MainThread:19419 [wandb_init.py:_log_setup():343] Logging internal logs to ./wandb/offline-run-20211030_162656-1rjlulmn/logs/debug-internal.log
+2021-10-30 16:26:56,156 INFO    MainThread:19419 [wandb_init.py:init():375] calling init triggers
+2021-10-30 16:26:56,156 INFO    MainThread:19419 [wandb_init.py:init():380] wandb.init called with sweep_config: {}
+config: {'epochs': 25, 'n_bins': 80, 'lr': 0.000357, 'wd': 0.1, 'w_chamfer': 0.1, 'div_factor': 25, 'final_div_factor': 100, 'bs': 16, 'validate_every': 100, 'gpu': 0, 'name': 'UnetAdaptiveBins', 'norm': 'linear', 'same_lr': False, 'distributed': False, 'root': '.', 'resume': '', 'notes': '', 'tags': 'sweep', 'workers': 1, 'dataset': 'nyu', 'data_path': '/home/fotouhif/Documents/MOVILAN/RGB_depth/data/Training_testing/RGB/', 'gt_path': '/home/fotouhif/Documents/MOVILAN/RGB_depth/data/Training_testing/depth/', 'filenames_file': '/home/fotouhif/Documents/MOVILAN/RGB_depth/data/alfred_rgb_depth_train_shuffle.txt', 'input_height': 300, 'input_width': 300, 'max_depth': 10000.0, 'min_depth': 1.0, 'do_random_rotate': True, 'degree': 2.5, 'do_kb_crop': False, 'use_right': False, 'data_path_eval': '/home/fotouhif/Documents/MOVILAN/RGB_depth/data/Training_testing/RGB/', 'gt_path_eval': '/home/fotouhif/Documents/MOVILAN/RGB_depth/data/Training_testing/depth/', 'filenames_file_eval': '/home/fotouhif/Documents/MOVILAN/RGB_depth/data/alfred_rgb_depth_test.txt', 'min_depth_eval': 1.0, 'max_depth_eval': 10000.0, 'eigen_crop': True, 'garg_crop': False, 'batch_size': 16, 'num_threads': 1, 'mode': 'train', 'chamfer': True, 'world_size': 1, 'rank': 0, 'num_workers': 1, 'ngpus_per_node': 1, 'multigpu': False, 'epoch': 0, 'last_epoch': -1}
+2021-10-30 16:26:56,156 INFO    MainThread:19419 [wandb_init.py:init():424] starting backend
+2021-10-30 16:26:56,156 INFO    MainThread:19419 [backend.py:_multiprocessing_setup():70] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2021-10-30 16:26:56,182 INFO    MainThread:19419 [backend.py:ensure_launched():135] starting backend process...
+2021-10-30 16:26:56,203 INFO    MainThread:19419 [backend.py:ensure_launched():139] started backend process with pid: 19817
+2021-10-30 16:26:56,204 INFO    MainThread:19419 [wandb_init.py:init():429] backend started and connected
+2021-10-30 16:26:56,209 INFO    MainThread:19419 [wandb_init.py:init():477] updated telemetry
+2021-10-30 16:26:56,210 INFO    MainThread:19419 [wandb_init.py:init():540] starting run threads in backend
+2021-10-30 16:26:58,329 INFO    MainThread:19419 [wandb_run.py:_console_start():1601] atexit reg
+2021-10-30 16:26:58,329 INFO    MainThread:19419 [wandb_run.py:_redirect():1475] redirect: SettingsConsole.REDIRECT
+2021-10-30 16:26:58,330 INFO    MainThread:19419 [wandb_run.py:_redirect():1480] Redirecting console.
+2021-10-30 16:26:58,331 INFO    MainThread:19419 [wandb_run.py:_redirect():1536] Redirects installed.
+2021-10-30 16:26:58,331 INFO    MainThread:19419 [wandb_init.py:init():565] run started, returning control to user process
+2021-10-30 16:26:58,931 INFO    MainThread:19419 [wandb_run.py:_atexit_cleanup():1571] got exitcode: 1
+2021-10-30 16:26:58,931 INFO    MainThread:19419 [wandb_run.py:_restore():1543] restore
+2021-10-30 16:27:01,363 INFO    MainThread:19419 [wandb_run.py:_wait_for_finish():1693] got exit ret: 
+2021-10-30 16:27:01,465 INFO    MainThread:19419 [wandb_run.py:_wait_for_finish():1693] got exit ret: done: true
+exit_result {
+}
+
+2021-10-30 16:27:02,552 INFO    MainThread:19419 [wandb_run.py:_show_summary():1848] rendering summary
+2021-10-30 16:27:02,552 INFO    MainThread:19419 [wandb_run.py:_show_history():1886] rendering history
