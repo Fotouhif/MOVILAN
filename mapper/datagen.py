@@ -32,20 +32,20 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--room', type=int, default=301)
 parser.add_argument('--task', type=int, default=1)
 
-parser.add_argument('--inputs', dest='inputs', action='store_true')
+parser.add_argument('--inputs', dest='inputs', action='store_true') ## ??? sometimes we have error for  -- comment linesfor testing an object
 parser.add_argument('--targets', dest='targets', action='store_true') #if --nomap is passed agent has to approximate bev proj using graph conv 
 parser.add_argument('--correct', dest='correct', action='store_true')
 
 
-parser.add_argument('--allinputs', dest='allinputs', action='store_true')
-parser.add_argument('--alltargets', dest='alltargets', action='store_true')
-parser.add_argument('--aliasinput', dest='aliasinput', action='store_true')
+parser.add_argument('--allinputs', dest='allinputs', action='store_true') #save panaroma projection images for some range of rooms in different location in room - Creating all the training inputs for graph convolution mapping training 
+parser.add_argument('--alltargets', dest='alltargets', action='store_true') #get targets for some range of rooms
+parser.add_argument('--aliasinput', dest='aliasinput', action='store_true') # ??? #change any key in any room for semantic maps in the inputs bev projections
 
-parser.add_argument('--checkpan', dest='checkpan', action='store_true')
-parser.add_argument('--checkinput', dest='checkinput', action='store_true')
-parser.add_argument('--checktarget', dest='checktarget', action='store_true')
-parser.add_argument('--specific_input', dest='specific_input', action='store_true')
-parser.add_argument('--live_explore', dest='live_explore', action='store_true')
+parser.add_argument('--checkpan', dest='checkpan', action='store_true') #Check panaroma image for a room
+parser.add_argument('--checkinput', dest='checkinput', action='store_true') # check if an input executes correctly
+parser.add_argument('--checktarget', dest='checktarget', action='store_true') # check targets for each room
+parser.add_argument('--specific_input', dest='specific_input', action='store_true') # For debugging purpose
+parser.add_argument('--live_explore', dest='live_explore', action='store_true') # You can explore lively in the env and see segmentation and ground truth map in terminal
 
 args = parser.parse_args()
 
@@ -135,6 +135,7 @@ if __name__ == '__main__':
         np.save('data/inputs/bev_'+repr(args.room)+'_'+repr(grid_coord)+'.npy',bev)
 
         #sample check the created projection map for a random object in the room
+        # Fateme : I think the following lines should be commented
         proj.displaymap(bev,'Desk')
         nav_map = proj.input_navigation_map(bev, 'Desk', grid_size = gridsize, unk_id = 0,flr_id = 1, tar_id = 2, obs_id = 3)
         print("Now displaying input navigation map")
@@ -186,7 +187,7 @@ if __name__ == '__main__':
         #env = ThorEnv(player_screen_width=IMAGE_WIDTH,player_screen_height=IMAGE_HEIGHT) #blank ai2thor environment
         env = sensing()
 
-        room_range = [308,330]
+        room_range = [1,31]
         print("Creating all the training targets for graph convolution mapping training ")
         
         for r in range(room_range[0], room_range[1]):
@@ -213,7 +214,7 @@ if __name__ == '__main__':
         #env = ThorEnv(player_screen_width=IMAGE_WIDTH,player_screen_height=IMAGE_HEIGHT) #blank ai2thor environment
         env = sensing()
 
-        room_range = [327,331]
+        room_range = [222,231]
         print("Creating all the training inputs for graph convolution mapping training ")
 
         for r in range(room_range[0], room_range[1]):

@@ -1,1 +1,4 @@
-<navigation> -> [walk:action_navi] [over:action_desc] to the [table:target_obj] and [bring:action_n_navi] the [apple:target_obj]
+<navigation> -> [turn:action_navi] [left:action_desc] and [veer:action_navi] [right:action_desc] to the [toilet:target_obj]
+<n_navigation> -> [pick:action_n_navi] [up:action_desc] the [toiletpaper:target_obj] [roll:target_obj] [on:refinement_rel] the [toilettank:refinement_obj]
+<navigation> -> [look:action_n_navi] [left:action_desc]
+<n_navigation> -> [put:action_n_navi] the [roll:target_obj] [on:refinement_rel] the [toilet:refinement_obj] [roll:refinement_obj] [dispenser:refinement_obj]

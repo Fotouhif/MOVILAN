@@ -17,7 +17,7 @@ import argparse
 import planner.low_level_planner.grid_planning as grid_planning
 import planner.low_level_planner.visibility_check as visibility_check
 import planner.low_level_planner.object_localization as object_localization
-import planner.low_level_planner.astar_search as astar_search
+#import planner.low_level_planner.astar_search as astar_search
 import planner.low_level_planner.refinement as refinement
 import planner.low_level_planner.exploration as exploration
 import planner.low_level_planner.resolve as resolve
@@ -27,7 +27,7 @@ occupancy_grid = grid_planning.occupancy_grid #occupancy grid function from grid
 target_visible = visibility_check.target_visible
 location_in_fov = object_localization.location_in_fov
 target_visible = visibility_check.target_visible
-graph_search = astar_search.search
+#graph_search = astar_search.search
 unit_refinement = refinement.unit_refinement
 nudge = refinement.nudge
 random_explore = exploration.random_explore

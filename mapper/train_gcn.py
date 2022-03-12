@@ -1,3 +1,11 @@
+import os
+from os import path
+import sys
+os.environ['MAIN'] = '../'
+sys.path.append(os.path.join(os.environ['MAIN']))
+
+from planner.low_level_planner import astar_search as ast
+
 import numpy as np
 import graph_convnet as gcn
 import params
@@ -7,7 +15,7 @@ import traceback
 import gtmaps as gtm
 import projection as proj
 
-import AStarSearch as ast
+#import AStarSearch as ast
 
 from os import path
 import sys
@@ -229,9 +237,6 @@ class graph_conv_trainer(object):
         #sys.exit(0)
         return deltas
             
-
-
-
 
     def sample_data(self):
         bad_target = False

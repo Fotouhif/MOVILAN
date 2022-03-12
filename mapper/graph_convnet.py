@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+import copy
 
 
 from dgl.nn.pytorch import GraphConv
@@ -498,10 +498,17 @@ class nav_graph(object): #class that manages the grid based graph topology for n
         g = dgl.DGLGraph()
         #print("Input n in gen_grid ",n)
         g.add_nodes(n**2)
+        #g.add_nodes(n*(n-1))
+        print("line 502")
+        print('We have %d nodes.' % g.number_of_nodes())
         nav = np.arange(n**2).reshape((n,n))
         self.pos = {}
 
-        for i in range(n**2):
+        #print('We have %d nodes in line 507.' % g.number_of_nodes())
+        temp = copy.copy(g.number_of_nodes())
+        for i in range(n**2): 
+            if g.number_of_nodes()>temp:
+                print("number of nodes have increased", i)
             r = i+self.hop_connection
             l = i-self.hop_connection
             u = i-(self.hop_connection*n)
@@ -513,11 +520,12 @@ class nav_graph(object): #class that manages the grid based graph topology for n
             dld = i+(self.hop_connection*n)-self.hop_connection
             drd = i+(self.hop_connection*n)+self.hop_connection
 
+            #print('We have %d nodes in line 520.' % g.number_of_nodes())
             #======================
             #Add up,down.left,right connections
             try:
                 if int(r/n)==int(i/n): #nodes are in the same row
-                    g.add_edge(i, r) #edge to rightwards node
+                    g.add_edges(i, r) #edge to rightwards node
                     if show:
                         print(i,r)
             except:
@@ -525,21 +533,21 @@ class nav_graph(object): #class that manages the grid based graph topology for n
             
             try:
                 if int(l/n)==int(i/n): #nodes are in the same row:
-                    g.add_edge(i, l) #edge to leftwards node
+                    g.add_edges(i, l) #edge to leftwards node
                     if show:
                         print(i,l)
             except:
                 pass
             
             try:
-                g.add_edge(i, d) #edge to downwards node
+                g.add_edges(i, d) #edge to downwards node
                 if show:
                     print(i,d)
             except:
                 pass
             
             try:
-                g.add_edge(i, u) #edge to upwards node
+                g.add_edges(i, u) #edge to upwards node
                 if show:
                     print(i,u)
             except:
@@ -550,7 +558,7 @@ class nav_graph(object): #class that manages the grid based graph topology for n
             #Add diagonal connections
             try:
                 if int(u/n)==int(uld/n): #nodes are in the same row
-                    g.add_edge(i, uld) #edge to upper left diagonal
+                    g.add_edges(i, uld) #edge to upper left diagonal
                     if show:
                         print(i,uld)
             except:
@@ -558,7 +566,7 @@ class nav_graph(object): #class that manages the grid based graph topology for n
             
             try:
                 if int(u/n)==int(urd/n): #nodes are in the same row
-                    g.add_edge(i, urd) #edge to upper right diagonal
+                    g.add_edges(i, urd) #edge to upper right diagonal
                     if show:
                         print(i,urd)
             except:
@@ -566,7 +574,7 @@ class nav_graph(object): #class that manages the grid based graph topology for n
 
             try:
                 if int(d/n)==int(dld/n): #nodes are in the same row
-                    g.add_edge(i, dld) #edge to down left diagonal
+                    g.add_edges(i, dld) #edge to down left diagonal
                     if show:
                         print(i,dld)
             except:
@@ -574,7 +582,7 @@ class nav_graph(object): #class that manages the grid based graph topology for n
 
             try:
                 if int(d/n)==int(drd/n): #nodes are in the same row
-                    g.add_edge(i, drd) #edge to down right diagonal
+                    g.add_edges(i, drd) #edge to down right diagonal
                     if show:
                         print(i,drd)
             except:
@@ -583,11 +591,13 @@ class nav_graph(object): #class that manages the grid based graph topology for n
 
 
             self.pos[i] = np.array([float(i%n),1.0-float(i/n)]) #enforces a grid layout to display the graph
+        print('We have %d nodes in line 589.' % g.number_of_nodes())
         self.nx_G = g.to_networkx()
         if show:
             #nx has a very hard time drawing big graphs n>30 or so
             nx.draw(g.to_networkx(), self.pos,with_labels=True)
             plt.show()
+        print("Line 591",n)
         print('We have %d nodes.' % g.number_of_nodes())
         print('We have %d edges.' % g.number_of_edges())
         return g
@@ -597,8 +607,9 @@ class nav_graph(object): #class that manages the grid based graph topology for n
         self.node_values = torch.from_numpy(np.zeros((self.n**2, self.node_value_dim),dtype = np.float32))
         #self.node_values = torch.rand((self.n**2, self.node_value_dim))/10.0 #lets try with random node values instead of zero
         #https://discuss.pytorch.org/t/how-to-concatenate-word-embedding-with-one-hot-vector/31577/3
-        
-        if self.embed_dim==0:
+        #print(self.g.ndata['feat'].shape)
+        print(self.node_values.shape)
+        if self.embed_dim==0:       
             self.g.ndata['feat'] = self.node_values
         elif self.embed_dim !=0:
             self.embed = nn.Embedding(self.n**2, self.embed_dim) 
@@ -606,7 +617,7 @@ class nav_graph(object): #class that manages the grid based graph topology for n
             self.g.ndata['feat'] = self.concats
 
         #edata is more like a selector function, so can specify with np array of discreet indices
-        self.g.edata['rel_type'] = np.zeros((self.g.number_of_edges(), 1),dtype = np.float32) #all edges are initialized to be of the type '0'
+        #self.g.edata['rel_type'] = np.zeros((self.g.number_of_edges(), 1),dtype = np.float32) #all edges are initialized to be of the type '0'
 
 
     def add_input(self, node_num, information = np.array([0,1,0,0,1,0,0,0,0,0], dtype = np.float32)):
