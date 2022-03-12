@@ -1,5 +1,10 @@
 *.pptx
 *.pyc
+.idea/*
+*/.idea/
+.DS_Store
+*/__pycache__/*
+
 MOVILAN_data/
 cross_modal/data/descriptions.json
 cross_modal/prehash.npy
@@ -7,4 +12,8 @@ cross_modal/unet_weights.pth
 mapper/nn_weights/
 mapper/data/
 language_understanding/alfred_model_1000_modification/
-**/__pycache__
+steps_to_run
+RGB_depth
+RGB_seg
+mapper/dgl
+mapper/ReadmeFateme
